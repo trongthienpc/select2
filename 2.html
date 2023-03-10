@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tagify Example</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.min.js"></script>
+</head>
+
+<body>
+    <input name='users-list-tags' value='abatisse2@nih.gov, Justinian Hattersley'>
+
+
+</body>
+
+</html>
+
+<style type="text/css">
+    /* Suggestions items */
+    :root {
+        --tagify-dd-item-pad: .5em .7em;
+    }
+
+    .tagify {
+        width: 100%;
+    }
+
+    .tagify__dropdown.users-list .tagify__dropdown__item {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0 1em;
+        grid-template-areas: "avatar name"
+            "avatar email";
+    }
+
+    .tagify__dropdown.users-list .tagify__dropdown__item:hover .tagify__dropdown__item__avatar-wrap {
+        transform: scale(1.2);
+    }
+
+    .tagify__dropdown.users-list .tagify__dropdown__item__avatar-wrap {
+        grid-area: avatar;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: #EEE;
+        transition: .1s ease-out;
+    }
+
+    .tagify__tag .tagify__tag__avatar-wrap {
+        width: 16px;
+        height: 16px;
+        white-space: normal;
+        border-radius: 50%;
+        background: silver;
+        margin-right: 5px;
+        transition: 0.12s ease-out;
+    }
+
+    .tagify__dropdown.users-list img {
+        width: 100%;
+        vertical-align: top;
+    }
+
+    .tagify__dropdown.users-list header.tagify__dropdown__item>div,
+    .tagify__dropdown.users-list .tagify__dropdown__item strong {
+        grid-area: name;
+        width: 100%;
+        align-self: center;
+    }
+
+    .tagify__dropdown.users-list span {
+        grid-area: email;
+        width: 100%;
+        font-size: .9em;
+        opacity: .6;
+    }
+
+    .tagify__dropdown.users-list .tagify__dropdown__item__addAll {
+        border-bottom: 1px solid #DDD;
+        gap: 0;
+    }
+
+    .tagify__dropdown.users-list .remove-all-tags {
+        float: right;
+        font-size: .8em;
+        padding: .2em .3em;
+        border-radius: 3px;
+        user-select: none;
+    }
+
+    .tagify__dropdown.users-list .remove-all-tags:hover {
+        color: white;
+        background: salmon;
+    }
+
+
+    /* Tags items */
+    #users-list .tagify__tag {
+        white-space: nowrap;
+    }
+
+    #users-list .tagify__tag img {
+        width: 100%;
+        vertical-align: top;
+        pointer-events: none;
+    }
+
+
+    #users-list .tagify__tag:hover .tagify__tag__avatar-wrap {
+        transform: scale(1.6) translateX(-10%);
+    }
+
+    #users-list .tagify__tag .tagify__tag__avatar-wrap {
+        width: 16px;
+        height: 16px;
+        white-space: normal;
+        border-radius: 50%;
+        background: silver;
+        margin-right: 5px;
+        transition: .12s ease-out;
+    }
+
+    .users-list .tagify__dropdown__itemsGroup:empty {
+        display: none;
+    }
+
+    .users-list .tagify__dropdown__itemsGroup::before {
+        content: attr(data-title);
+        display: inline-block;
+        font-size: .9em;
+        padding: 4px 6px;
+        margin: var(--tagify-dd-item-pad);
+        font-style: italic;
+        border-radius: 4px;
+        background: #00ce8d;
+        color: white;
+        font-weight: 600;
+    }
+
+    .users-list .tagify__dropdown__itemsGroup:not(:first-of-type) {
+        border-top: 1px solid #DDD;
+    }
+
+    .tagify__tag__avatar-wrap img {
+        width: 100%;
+        vertical-align: top;
+        pointer-events: none;
+    }
+</style>
+
+<script>
+
+
+    const filterData = async () => {
+        var inputElm = document.querySelector('input[name=users-list-tags]');
+
+        const getUsers = async () => {
+            try {
+                const response = await fetch("https://randomuser.me/api/?results=5");
+                const data = await response.json();
+                const users = data.results.map((result) => {
+                    return {
+                        value: result.login.uuid,
+                        name: `${result.name.first} ${result.name.last}`,
+                        avatar: result.picture.thumbnail,
+                        email: result.email,
+                        team: "A"
+                    };
+                });
+                return users;
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        const whitelist = ["idLsc", "loaiSuco", "nhomSuco", "chitietSuco", "sudung"];
+        const users = [
+            {
+                "idLsc": 109,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Báo_cáo_khác_không_liên_quan_các_mục_trên",
+                "chitietSuco": "Giao tiếp, thái độ nhân viên y tế",
+                "sudung": true
+            },
+            {
+                "idLsc": 108,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Góp_ý_cải_tiến",
+                "chitietSuco": "Hạ tầng cơ sở, trang thiết bị ",
+                "sudung": true
+            },
+            {
+                "idLsc": 107,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Góp_ý_cải_tiến",
+                "chitietSuco": "Quy trình vận hành",
+                "sudung": true
+            },
+            {
+                "idLsc": 106,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Góp_ý_cải_tiến",
+                "chitietSuco": "Quy trình chuyên môn",
+                "sudung": true
+            },
+            {
+                "idLsc": 105,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hồ_sơ,_tài_liệu,_thủ_tục_hành_chánh",
+                "chitietSuco": "Thủ tục hành chính phức tạp",
+                "sudung": true
+            },
+            {
+                "idLsc": 104,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hồ_sơ,_tài_liệu,_thủ_tục_hành_chánh",
+                "chitietSuco": "Nhầm hồ sơ tài liệu",
+                "sudung": true
+            },
+            {
+                "idLsc": 103,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hồ_sơ,_tài_liệu,_thủ_tục_hành_chánh",
+                "chitietSuco": "Cung cấp hồ sơ tài liệu chậm",
+                "sudung": true
+            },
+            {
+                "idLsc": 102,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hồ_sơ,_tài_liệu,_thủ_tục_hành_chánh",
+                "chitietSuco": "Thời gian chờ đợi kéo dài",
+                "sudung": true
+            },
+            {
+                "idLsc": 101,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hồ_sơ,_tài_liệu,_thủ_tục_hành_chánh",
+                "chitietSuco": "Tài liệu không rõ ràng, không hoàn chỉnh",
+                "sudung": true
+            },
+            {
+                "idLsc": 100,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hồ_sơ,_tài_liệu,_thủ_tục_hành_chánh",
+                "chitietSuco": "Tài liệu mất hoặc thiếu",
+                "sudung": true
+            },
+            {
+                "idLsc": 99,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Thuốc/dịch_truyền",
+                "chitietSuco": "Sai y lệnh",
+                "sudung": true
+            },
+            {
+                "idLsc": 98,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Thuốc/dịch_truyền",
+                "chitietSuco": "Thuốc hết hạn dùng",
+                "sudung": true
+            },
+            {
+                "idLsc": 97,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Thuốc/dịch_truyền",
+                "chitietSuco": "Thiếu thuốc",
+                "sudung": true
+            },
+            {
+                "idLsc": 96,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Thuốc/dịch_truyền",
+                "chitietSuco": "Bỏ sót thuốc/liều thuốc/dịch truyền",
+                "sudung": true
+            },
+            {
+                "idLsc": 95,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Các_quy_trình_thủ_thuật",
+                "chitietSuco": "Thực hiện các tiến trình thủ thuật mà không có sự chấp thuận của người bệnh/người nhà",
+                "sudung": true
+            },
+            {
+                "idLsc": 94,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Quản_trị_lâm_sàng",
+                "chitietSuco": "Quy trình kỹ thuật",
+                "sudung": true
+            },
+            {
+                "idLsc": 93,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Quản_trị_lâm_sàng",
+                "chitietSuco": "Phác đồ",
+                "sudung": true
+            },
+            {
+                "idLsc": 92,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Quản_trị_lâm_sàng",
+                "chitietSuco": "Lỗi hồ sơ bệnh án Ngoại trú - Chất lượng chăm sóc, điều dưỡng",
+                "sudung": true
+            },
+            {
+                "idLsc": 91,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Quản_trị_lâm_sàng",
+                "chitietSuco": "Lỗi hồ sơ bệnh án Ngoại trú - Chất lượng chẩn đoán, điều trị",
+                "sudung": true
+            },
+            {
+                "idLsc": 90,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Quản_trị_lâm_sàng",
+                "chitietSuco": "Lỗi hồ sơ bệnh án Ngoại trú - Hành chánh",
+                "sudung": true
+            },
+            {
+                "idLsc": 89,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Quản_trị_lâm_sàng",
+                "chitietSuco": "Lỗi hồ sơ bệnh án nội trú - Chất lượng chăm sóc, điều dưỡng",
+                "sudung": true
+            },
+            {
+                "idLsc": 88,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Quản_trị_lâm_sàng",
+                "chitietSuco": "Lỗi hồ sơ bệnh án nội trú - Chất lượng chẩn đoán, điều trị",
+                "sudung": true
+            },
+            {
+                "idLsc": 87,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Quản_trị_lâm_sàng",
+                "chitietSuco": "Lỗi hồ sơ bệnh án nội trú - Hành chánh",
+                "sudung": true
+            },
+            {
+                "idLsc": 86,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "An_toàn_người_bệnh",
+                "chitietSuco": "Phòng ngừa té ngã cho người bệnh",
+                "sudung": true
+            },
+            {
+                "idLsc": 85,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "An_toàn_người_bệnh",
+                "chitietSuco": "Các vấn đề công tác kiểm soát nhiễm khuẩn",
+                "sudung": true
+            },
+            {
+                "idLsc": 84,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "An_toàn_người_bệnh",
+                "chitietSuco": "Các vấn đề an toàn phẫu thuật, thủ thuật",
+                "sudung": true
+            },
+            {
+                "idLsc": 83,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "An_toàn_người_bệnh",
+                "chitietSuco": "Bàn giao người bệnh",
+                "sudung": true
+            },
+            {
+                "idLsc": 82,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "An_toàn_người_bệnh",
+                "chitietSuco": "Trao đổi thông tin",
+                "sudung": true
+            },
+            {
+                "idLsc": 81,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "An_toàn_người_bệnh",
+                "chitietSuco": "Nhận diện người bệnh",
+                "sudung": true
+            },
+            {
+                "idLsc": 80,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Không_tuân_thủ_QT/QĐ",
+                "chitietSuco": "Không tuân thủ quy định\r\n",
+                "sudung": true
+            },
+            {
+                "idLsc": 79,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Thất_lạc_giao_tử_phôi",
+                "chitietSuco": "Thất lạc so với vị trí trên hồ sơ",
+                "sudung": true
+            },
+            {
+                "idLsc": 78,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Khác",
+                "chitietSuco": "Khác",
+                "sudung": true
+            },
+            {
+                "idLsc": 77,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Theo_dõi_dữ_liệu",
+                "chitietSuco": "Theo dõi dữ liệu (KPIs)",
+                "sudung": true
+            },
+            {
+                "idLsc": 76,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Sức_khỏe_và_an_toàn_lao_động",
+                "chitietSuco": "Sức khỏe và an toàn lao động",
+                "sudung": true
+            },
+            {
+                "idLsc": 75,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Vi_phạm_bảo_mật_thông_tin",
+                "chitietSuco": "Vi phạm bảo mật thông tin",
+                "sudung": true
+            },
+            {
+                "idLsc": 74,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Quá_kích_buồng_trứng",
+                "chitietSuco": "Quá kích buồng trứng",
+                "sudung": true
+            },
+            {
+                "idLsc": 73,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Không_tuân_thủ_luật_định",
+                "chitietSuco": "Không tuân thủ luật định",
+                "sudung": true
+            },
+            {
+                "idLsc": 72,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Không_tuân_thủ_QT/QĐ",
+                "chitietSuco": "Không tuân thủ quy trình",
+                "sudung": true
+            },
+            {
+                "idLsc": 71,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Không_gây_ảnh_hưởng",
+                "chitietSuco": "Sự cố xảy ra nhưng không gây ảnh hưởng",
+                "sudung": true
+            },
+            {
+                "idLsc": 70,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Đa_thai",
+                "chitietSuco": "Đa thai",
+                "sudung": true
+            },
+            {
+                "idLsc": 69,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Thất_lạc_giao_tử_phôi",
+                "chitietSuco": "Thất lạc trong thao tác",
+                "sudung": true
+            },
+            {
+                "idLsc": 68,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Nhà_cung_cấp",
+                "chitietSuco": "Các vấn đề liên quan đến nhà cung cấp chính",
+                "sudung": true
+            },
+            {
+                "idLsc": 67,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Nhiễm_trùng",
+                "chitietSuco": "Nhiễm trùng",
+                "sudung": true
+            },
+            {
+                "idLsc": 66,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Lỗi_nhận_diện",
+                "chitietSuco": "Lỗi nhận diện hoặc nhầm lẫn mẫu/bệnh nhân",
+                "sudung": true
+            },
+            {
+                "idLsc": 65,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Lỗi_thiết_bị",
+                "chitietSuco": "Lỗi thiết bị ",
+                "sudung": true
+            },
+            {
+                "idLsc": 64,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Than_phiền_góp_ý",
+                "chitietSuco": "Than phiền/góp ý từ - Nhà cung cấp",
+                "sudung": true
+            },
+            {
+                "idLsc": 63,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Than_phiền_góp_ý",
+                "chitietSuco": "Than phiền/góp ý từ - Cơ quan quản lý",
+                "sudung": true
+            },
+            {
+                "idLsc": 62,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Than_phiền_góp_ý",
+                "chitietSuco": "Than phiền/góp ý từ - Nhân viên IVF",
+                "sudung": true
+            },
+            {
+                "idLsc": 61,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Than_phiền_góp_ý",
+                "chitietSuco": "Than phiền/góp ý từ - Khách hàng",
+                "sudung": true
+            },
+            {
+                "idLsc": 60,
+                "loaiSuco": "IVF",
+                "nhomSuco": "Tai_nạn",
+                "chitietSuco": "Tai nạn",
+                "sudung": true
+            },
+            {
+                "idLsc": 48,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Khác",
+                "chitietSuco": "Các sự cố không đề cập trong các mục trên",
+                "sudung": true
+            },
+            {
+                "idLsc": 43,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hành_vi",
+                "chitietSuco": "Trốn viện",
+                "sudung": true
+            },
+            {
+                "idLsc": 42,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hành_vi",
+                "chitietSuco": "Xâm hại cơ thể bởi người bệnh/khách đến thăm",
+                "sudung": true
+            },
+            {
+                "idLsc": 41,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hành_vi",
+                "chitietSuco": "Xâm hại cơ thể bởi nhân viên",
+                "sudung": true
+            },
+            {
+                "idLsc": 40,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hành_vi",
+                "chitietSuco": "Quấy rối tình dục bởi người bệnh/ khách đến thăm",
+                "sudung": true
+            },
+            {
+                "idLsc": 39,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hành_vi",
+                "chitietSuco": "Quấy rối tình dục bởi nhân viên",
+                "sudung": true
+            },
+            {
+                "idLsc": 38,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hành_vi",
+                "chitietSuco": "Có hành động tự tử",
+                "sudung": true
+            },
+            {
+                "idLsc": 37,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hành_vi",
+                "chitietSuco": "Khuynh hướng tự gây hại/tự tử",
+                "sudung": true
+            },
+            {
+                "idLsc": 36,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Tai_nạn_đối_với_người_bệnh",
+                "chitietSuco": "Té ngã",
+                "sudung": true
+            },
+            {
+                "idLsc": 35,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Quản_lý_nguồn_lực_tổ_chức",
+                "chitietSuco": "Sự phù hợp/sẵn sàng của các Quy trình/quy định/chính sách/hướng dẫn",
+                "sudung": true
+            },
+            {
+                "idLsc": 34,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Quản_lý_nguồn_lực_tổ_chức",
+                "chitietSuco": "Sự phù hợp/sẵn sàng của nhân viên/nguồn nhân sự",
+                "sudung": true
+            },
+            {
+                "idLsc": 33,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Quản_lý_nguồn_lực_tổ_chức",
+                "chitietSuco": "Sự phù hợp/sẵn sàng của giường bệnh/dịch vụ",
+                "sudung": true
+            },
+            {
+                "idLsc": 32,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hạ_tầng_cơ_sở_thiết_bị_y_tế",
+                "chitietSuco": "Thiếu thông tin hướng dẫn sử dụng",
+                "sudung": true
+            },
+            {
+                "idLsc": 31,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hạ_tầng_cơ_sở_thiết_bị_y_tế",
+                "chitietSuco": "Không phù hợp/không tồn tại/không đúng vị trí",
+                "sudung": true
+            },
+            {
+                "idLsc": 30,
+                "loaiSuco": "Ngoài_chuyên_môn",
+                "nhomSuco": "Hạ_tầng_cơ_sở_thiết_bị_y_tế",
+                "chitietSuco": "Bị hư hỏng/Bị lỗi",
+                "sudung": true
+            },
+            {
+                "idLsc": 28,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Máu_và_sản_phẩm_máu",
+                "chitietSuco": "Truyền sai liều/sai thời điểm",
+                "sudung": true
+            },
+            {
+                "idLsc": 27,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Máu_và_sản_phẩm_máu",
+                "chitietSuco": "Truyền nhầm máu/sản phẩm máu",
+                "sudung": true
+            },
+            {
+                "idLsc": 26,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Máu_và_sản_phẩm_máu",
+                "chitietSuco": "Phản ứng phụ/tai biến khi truyền máu",
+                "sudung": true
+            },
+            {
+                "idLsc": 25,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Thuốc/dịch_truyền",
+                "chitietSuco": "Sai sót khi cho y lệnh",
+                "sudung": true
+            },
+            {
+                "idLsc": 24,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Thuốc/dịch_truyền",
+                "chitietSuco": "Sai đường dùng",
+                "sudung": true
+            },
+            {
+                "idLsc": 23,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Thuốc/dịch_truyền",
+                "chitietSuco": "Sai thời gian",
+                "sudung": true
+            },
+            {
+                "idLsc": 22,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Thuốc/dịch_truyền",
+                "chitietSuco": "Sai người bệnh",
+                "sudung": true
+            },
+            {
+                "idLsc": 21,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Thuốc/dịch_truyền",
+                "chitietSuco": "Sai liều/sai hàm lượng",
+                "sudung": true
+            },
+            {
+                "idLsc": 20,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Thuốc/dịch_truyền",
+                "chitietSuco": "Sai thuốc",
+                "sudung": true
+            },
+            {
+                "idLsc": 19,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Thuốc/dịch_truyền",
+                "chitietSuco": "Phản ứng phụ",
+                "sudung": true
+            },
+            {
+                "idLsc": 18,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Thuốc/dịch_truyền",
+                "chitietSuco": "Thuốc không có sẵn",
+                "sudung": true
+            },
+            {
+                "idLsc": 16,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Thuốc/dịch_truyền",
+                "chitietSuco": "Cấp phát sai thuốc, dịch truyền",
+                "sudung": true
+            },
+            {
+                "idLsc": 15,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Nhiễm_trùng_liên_quan_đến_chăm_sóc_y_tế",
+                "chitietSuco": "Các bệnh truyền nhiễm",
+                "sudung": true
+            },
+            {
+                "idLsc": 14,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Nhiễm_trùng_liên_quan_đến_chăm_sóc_y_tế",
+                "chitietSuco": "Nhiễm trùng niệu do ống thông tiểu",
+                "sudung": true
+            },
+            {
+                "idLsc": 13,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Nhiễm_trùng_liên_quan_đến_chăm_sóc_y_tế",
+                "chitietSuco": "Viêm phổi",
+                "sudung": true
+            },
+            {
+                "idLsc": 12,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Nhiễm_trùng_liên_quan_đến_chăm_sóc_y_tế",
+                "chitietSuco": "Nhiễm khuẩn vết mổ",
+                "sudung": true
+            },
+            {
+                "idLsc": 11,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Nhiễm_trùng_liên_quan_đến_chăm_sóc_y_tế",
+                "chitietSuco": "Nhiễm khuẩn huyết",
+                "sudung": true
+            },
+            {
+                "idLsc": 10,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Các_quy_trình_thủ_thuật",
+                "chitietSuco": "Tử vong khi sinh",
+                "sudung": true
+            },
+            {
+                "idLsc": 9,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Các_quy_trình_thủ_thuật",
+                "chitietSuco": "Trẻ sơ sinh tử vong đủ tháng",
+                "sudung": true
+            },
+            {
+                "idLsc": 8,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Các_quy_trình_thủ_thuật",
+                "chitietSuco": "Tử vong trong thai kỳ không có bệnh lý",
+                "sudung": true
+            },
+            {
+                "idLsc": 7,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Các_quy_trình_thủ_thuật",
+                "chitietSuco": "Bỏ sót dụng cụ, vật lạ trong quá trình phẫu thuật",
+                "sudung": true
+            },
+            {
+                "idLsc": 6,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Các_quy_trình_thủ_thuật",
+                "chitietSuco": "Thực hiện sai vị trí phẫu thuật/thủ thuật",
+                "sudung": true
+            },
+            {
+                "idLsc": 5,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Các_quy_trình_thủ_thuật",
+                "chitietSuco": "Thực hiện sai thủ thuật/quy trình/phương pháp điều trị",
+                "sudung": true
+            },
+            {
+                "idLsc": 4,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Các_quy_trình_thủ_thuật",
+                "chitietSuco": "Thực hiện sai người bệnh",
+                "sudung": true
+            },
+            {
+                "idLsc": 3,
+                "loaiSuco": "Chuyên_môn",
+                "nhomSuco": "Các_quy_trình_thủ_thuật",
+                "chitietSuco": "Không thực hiện khi có chỉ định",
+                "sudung": true
+            }
+        ]
+
+
+        const filteredData = users.map((user) => {
+            return Object.fromEntries(
+                Object.entries(user).filter(([key, value]) => whitelist.includes(key))
+            );
+        });
+
+        console.log('filteredData', filteredData)
+
+        var tagify = new Tagify(inputElm, {
+            tagTextProp: 'chitietSuco', // very important since a custom template is used with this property as text
+            // enforceWhitelist: true,
+            skipInvalid: true, // do not remporarily add invalid tags
+            dropdown: {
+                closeOnSelect: false,
+                enabled: 0,
+                classname: 'users-list',
+                searchKeys: ['chitietSuco', 'nhomSuco']  // very important to set by which keys to search for suggesttions when typing
+            },
+            templates: {
+                tag: tagTemplate,
+                dropdownItem: suggestionItemTemplate,
+                // dropdownHeader: dropdownHeaderTemplate
+            },
+            whitelist: filteredData,
+
+            // transformTag: (tagData, originalData) => {
+            //     var { name, email } = parseFullValue(tagData.name)
+            //     tagData.name = name
+            //     tagData.email = email || tagData.email
+            // },
+
+            // validate({ name, email }) {
+            //     // when editing a tag, there will only be the "name" property which contains name + email (see 'transformTag' above)
+            //     if (!email && name) {
+            //         var parsed = parseFullValue(name)
+            //         name = parsed.name
+            //         email = parsed.email
+            //     }
+
+            //     if (!name) return "Missing name"
+            //     if (!validateEmail(email)) return "Invalid email"
+
+            //     return true
+            // }
+        })
+
+        // The below part is only if you want to split the users into groups, when rendering the suggestions list dropdown:
+        // (since each user also has a 'team' property)
+        tagify.dropdown.createListHTML = suggestionsList => {
+            const teamsOfUsers = suggestionsList.reduce((acc, suggestion) => {
+                const team = suggestion.nhomSuco || 'Not Assigned';
+
+                if (!acc[team])
+                    acc[team] = [suggestion]
+                else
+                    acc[team].push(suggestion)
+
+                return acc
+            }, {})
+
+            const getUsersSuggestionsHTML = teamUsers => teamUsers.map((suggestion, idx) => {
+                if (typeof suggestion == 'string' || typeof suggestion == 'number')
+                    suggestion = { value: suggestion }
+                var value = tagify.dropdown.getMappedValue.call(tagify, suggestion)
+
+                suggestion.value = value && typeof value == 'string' ? escapeHTML(value) : value
+
+                return tagify.settings.templates.dropdownItem.apply(tagify, [suggestion]);
+            }).join("")
+
+            // assign the user to a group
+            return Object.entries(teamsOfUsers).map(([team, teamUsers]) => {
+                return `<div class="tagify__dropdown__itemsGroup" data-title="Team ${team}:">${getUsersSuggestionsHTML(teamUsers)}</div>`
+            }).join("")
+        }
+
+        // attach events listeners
+        tagify.on('dropdown:select', onSelectSuggestion) // allows selecting all the suggested (whitelist) items
+            .on('edit:start', onEditStart)  // show custom text in the tag while in edit-mode
+
+        function tagTemplate(tagData) {
+            return `
+                    <tag title="${tagData.idLsc}"
+                            contenteditable='false'
+                            spellcheck='false'
+                            tabIndex="-1"
+                            class="tagify__tag ${tagData.class ? tagData.class : ""}"
+                            ${this.getAttributes(tagData)}>
+                        <x title='' class='tagify__tag__removeBtn' role='button' aria-label='remove tag'></x>
+                        <div>
+                            <span class='tagify__tag-text'>${tagData.chitietSuco}</span>
+                        </div>
+                    </tag>
+                `
+        }
+
+        function suggestionItemTemplate(tagData) {
+            return `
+                    <div ${this.getAttributes(tagData)}
+                        class='tagify__dropdown__item ${tagData.class ? tagData.class : ""}'
+                        tabindex="0"
+                        role="option">
+                        <strong>${tagData.name}</strong>
+                        <span>${tagData.team}</span>
+                    </div>
+                `
+        }
+
+        function dropdownHeaderTemplate(suggestions) {
+            return `
+    <header data-selector='tagify-suggestions-header' class="${this.settings.classNames.dropdownItem} ${this.settings.classNames.dropdownItem}__addAll">
+        <div>
+            <strong>${this.value.length ? `Add Remaning` : 'Add All'}</strong>
+            <a class='remove-all-tags'>Remove all</a>
+        </div>
+        <span>${suggestions.length} members</span>
+    </header>
+`
+        }
+
+        function escapeHTML(s) {
+            return typeof s == 'string' ? s
+                .replace(/&/g, "&")
+                .replace(/</g, "<")
+                .replace(/>/g, ">")
+                .replace(/"/g, "&quot;")
+                .replace(/`|'/g, "'") : s;
+        }
+
+        function onSelectSuggestion(e) {
+            if (e.detail.event.target.matches('.remove-all-tags')) {
+                tagify.removeAllTags()
+            }
+
+            // custom class from "dropdownHeaderTemplate"
+            else if (e.detail.elm.classList.contains(`${tagify.settings.classNames.dropdownItem}__addAll`))
+                tagify.dropdown.selectAll();
+        }
+
+        function onEditStart({ detail: { tag, data } }) {
+            console.log('tag', tag)
+            tagify.setTagTextNode(tag, `${data.name} <${data.email}>`)
+        }
+
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+        }
+
+        function parseFullValue(value) {
+            // https://stackoverflow.com/a/11592042/104380
+            var parts = value.split(/<(.*?)>/g),
+                name = parts[0].trim(),
+                email = parts[1]?.replace(/<(.*?)>/g, '').trim();
+
+            return { name, email }
+        }
+
+    };
+
+    filterData();
+
+
+
+
+
+</script>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chosen Example</title>
+
+    <!-- Include Bootstrap CSS and Chosen CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
+</head>
+
+<body>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Chosen Example</h4>
+                </div>
+                <div class="modal-body">
+                    <select class="chosen-select form-control" data-placeholder="Select an option">
+                        <option value=""></option>
+                        <option value="1">Option 1</option>
+                        <option value="2">Option 2</option>
+                        <option value="3">Option 3</option>
+                        <option value="4">Option 4</option>
+                        <option value="5">Option 5</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+        Open Modal
+    </button>
+
+    <select class="chosen-select form-control" data-placeholder="Select an option">
+        <option value=""></option>
+        <option value="1">Option 1</option>
+        <option value="2">Option 2</option>
+        <option value="3">Option 3</option>
+        <option value="4">Option 4</option>
+        <option value="5">Option 5</option>
+    </select>
+
+    <!-- Include jQuery, Bootstrap JS, and Chosen JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+
+    <script>
+
+        $(".chosen-select").chosen({
+            width: '100%',
+            placeholder_text_single: 'Select an option',
+            disable_search_threshold: 10,
+            no_results_text: "Oops, nothing found!",
+            search_contains: true
+        });
+
+        $(".chosen-select").on("chosen:showing_dropdown", function () {
+            var search = $(this).next('.chosen-container').find('.chosen-search input');
+            search.focus();
+        });
+        $(document).ready(function () {
+            $('#myModal').on('shown.bs.modal', function () {
+                $(".chosen-select").chosen({
+                    width: '100%',
+                    placeholder_text_single: 'Select an option',
+                    disable_search_threshold: 10,
+                    no_results_text: "Oops, nothing found!",
+                    search_contains: true
+                });
+
+                $(".chosen-select").on("chosen:showing_dropdown", function () {
+                    var search = $(this).next('.chosen-container').find('.chosen-search input');
+                    search.focus();
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
