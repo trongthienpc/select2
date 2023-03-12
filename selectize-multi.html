@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.min.css"> -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.legacy.css"> -->
+    <!-- <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.default.min.css"> -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container mt-3">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
+            Launch modal
+        </button>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="height: 400px;">
+                    <div class="row">
+                        <div class="col">
+                            <label for="select-tools" class="form-label">Using the API:</label>
+                            <select id="select-tools" class="form-control" multiple
+                                placeholder="Pick a tool..."></select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="select-console" class="form-label">Dynamic Option Groups:</label>
+                            <select id="select-console" class="demo-consoles form-control" multiple
+                                placeholder="Select console..."></select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="remove-button">Button remove:</label>
+                            <select id="remove-button" multiple></select>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="selectedItem" class="form-label">Selected option:</label>
+                            <div class="col">
+                                <textarea class="form-control" name="selectedItem" id="selectedItem" cols="30"
+                                    rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="getValue()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+<script>
+    // Selectize the element with ID "select-tools"
+    var $select = $('#select-tools').selectize({
+        // Set the maximum number of items that can be selected to null (i.e. unlimited)
+        maxItems: null,
+        // Use the "id" property of each option object as its value
+        valueField: 'id',
+        // Use the "title" property of each option object as its label
+        labelField: 'title',
+        // Allow searching for options based on their "title" property
+        searchField: 'title',
+        // Provide an array of options, each represented by an object with an "id", "title", and "url" property
+        options: [
+            { id: 1, title: 'Spectrometer', url: 'http://en.wikipedia.org/wiki/Spectrometers' },
+            { id: 2, title: 'Star Chart', url: 'http://en.wikipedia.org/wiki/Star_chart' },
+            { id: 3, title: 'Electrical Tape', url: 'http://en.wikipedia.org/wiki/Electrical_tape' }
+        ],
+        // Do not allow the creation of new options
+        create: false
+    });
+
+    $('#select-console').selectize({
+        options: [
+            { manufacturer: 'nintendo', value: "nes", name: "Nintendo Entertainment System" },
+            { manufacturer: 'nintendo', value: "snes", name: "Super Nintendo Entertainment System" },
+            { manufacturer: 'nintendo', value: "n64", name: "Nintendo 64" },
+            { manufacturer: 'nintendo', value: "gamecube", name: "GameCube" },
+            { manufacturer: 'nintendo', value: "wii", name: "Wii" },
+            { manufacturer: 'microsoft', value: 'xss', name: 'Xbox Series S' },
+            { manufacturer: 'nintendo', value: "wiiu", name: "Wii U" },
+            { manufacturer: 'nintendo', value: "switch", name: "Switch" },
+            { manufacturer: 'sony', value: 'ps1', name: 'PlayStation' },
+            { manufacturer: 'sony', value: 'ps2', name: 'PlayStation 2' },
+            { manufacturer: 'sony', value: 'ps3', name: 'PlayStation 3' },
+            { manufacturer: 'sony', value: 'ps4', name: 'PlayStation 4' },
+            { manufacturer: 'sony', value: 'ps5', name: 'PlayStation 5' },
+            { manufacturer: 'microsoft', value: 'xbox', name: 'Xbox' },
+            { manufacturer: 'microsoft', value: '360', name: 'Xbox 360' },
+            { manufacturer: 'microsoft', value: 'xbone', name: 'Xbox One' },
+            { manufacturer: 'microsoft', value: 'xsx', name: 'Xbox Series X' }
+        ],
+        optionGroupRegister: function (optgroup) {
+            // Capitalize the manufacturer name for display purposes
+            var capitalized = optgroup.charAt(0).toUpperCase() + optgroup.substring(1);
+            var group = {
+                // Set the label of the option group
+                label: 'Manufacturer: ' + capitalized
+            };
+            // Set the value of the option group to the manufacturer name
+            group[this.settings.optgroupValueField] = optgroup;
+
+            return group;
+        },
+        optgroupField: 'manufacturer', // Field to group options by
+        labelField: 'name', // Field to display as option label
+        searchField: ['name'], // Fields to search for user input
+        sortField: 'name' // Field to use for sorting options
+    });
+
+
+
+    $("#remove-button").selectize({
+        plugins: ["remove_button"], // Enable the remove button plugin
+        delimiter: ",", // Character used to separate multiple values
+        persist: false,
+        options: [
+            { manufacturer: 'nintendo', value: "nes", name: "Nintendo Entertainment System" },
+            { manufacturer: 'nintendo', value: "snes", name: "Super Nintendo Entertainment System" },
+            { manufacturer: 'nintendo', value: "n64", name: "Nintendo 64" },
+            { manufacturer: 'nintendo', value: "gamecube", name: "GameCube" },
+            { manufacturer: 'nintendo', value: "wii", name: "Wii" },
+            { manufacturer: 'microsoft', value: 'xss', name: 'Xbox Series S' },
+            { manufacturer: 'nintendo', value: "wiiu", name: "Wii U" },
+            { manufacturer: 'nintendo', value: "switch", name: "Switch" },
+            { manufacturer: 'sony', value: 'ps1', name: 'PlayStation' },
+            { manufacturer: 'sony', value: 'ps2', name: 'PlayStation 2' },
+            { manufacturer: 'sony', value: 'ps3', name: 'PlayStation 3' },
+            { manufacturer: 'sony', value: 'ps4', name: 'PlayStation 4' },
+            { manufacturer: 'sony', value: 'ps5', name: 'PlayStation 5' },
+            { manufacturer: 'microsoft', value: 'xbox', name: 'Xbox' },
+            { manufacturer: 'microsoft', value: '360', name: 'Xbox 360' },
+            { manufacturer: 'microsoft', value: 'xbone', name: 'Xbox One' },
+            { manufacturer: 'microsoft', value: 'xsx', name: 'Xbox Series X' }
+        ],
+
+        // Define how options are grouped in the dropdown
+        optionGroupRegister: function (optgroup) {
+            // Capitalize the manufacturer name for display purposes
+            var capitalized = optgroup.charAt(0).toUpperCase() + optgroup.substring(1);
+            var group = {
+                label: 'Manufacturer: ' + capitalized
+            };
+
+            group[this.settings.optgroupValueField] = optgroup;
+
+            return group;
+        },
+        optgroupField: 'manufacturer', // Field used to group options
+        labelField: 'name', // Field used for display in the dropdown and tags
+        searchField: ['name'], // Fields used for searching options
+        sortField: 'name', // Field used for sorting options alphabetically
+        create: function (input) {
+            // Allow creating new tags with arbitrary text
+            return {
+                value: input,
+                name: input,
+            };
+        },
+    });
+
+    // Set the initial selected values for the selectize.js instance
+    $('#remove-button')[0].selectize.setValue(['xss', 'ps2', '360']);
+
+
+
+    function getValue() {
+        // Get the selected values from the three selectize inputs
+        const removeButtonSelectize = $('#remove-button')[0].selectize;
+        const selectConsoleSelectize = $('#select-console')[0].selectize;
+        const selectToolsSelectize = $('#select-tools')[0].selectize;
+
+        // Join the selected values into a single string
+        const selectedRemoveButtonValues = removeButtonSelectize.getValue();
+        const selectedSelectConsoleValues = selectConsoleSelectize.getValue();
+        const selectedSelectToolsValues = selectToolsSelectize.getValue();
+
+        // Display the selected values in the textarea element
+        const displayArea = document.getElementById("selectedItem");
+        displayArea.value = `${selectedRemoveButtonValues}\n${selectedSelectConsoleValues}\n${selectedSelectToolsValues}`;
+    }
+
+</script>

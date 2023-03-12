@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
+    <!-- choose the theme you want to apply -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.min.css"> -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.legacy.css"> -->
+    <!-- <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.default.min.css"> -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container mt-3">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
+            Launch modal
+        </button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="height: 400px;">
+                    <div class="row">
+                        <div class="col">
+                            <label for="normalize" class="form-label">Single select</label>
+                            <select id="normalize" class="form-control">
+                                <option value=""></option>
+                                <option value="1">Awesome</option>
+                                <option value="2">Beast</option>
+                                <option value="3">Compatible</option>
+                                <option value="4">Thomas Edison</option>
+                                <option value="5">Nikola</option>
+                                <option value="6">Selectize</option>
+                                <option value="7">Javascript</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="select-console" class="form-label">Dynamic Option Groups:</label>
+                            <select id="select-console" class="demo-consoles form-control"
+                                placeholder="Select console..."></select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="selectedItem" class="form-label">Selected option:</label>
+                            <div class="col">
+                                <textarea class="form-control" name="selectedItem" id="selectedItem" cols="30"
+                                    rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="displaySelectedValues()">Save
+                        changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+<script>
+    // Define the available options for the dropdown
+    $('#select-console').selectize({
+        options: [
+            { manufacturer: 'nintendo', value: "nes", name: "Nintendo Entertainment System" },
+            { manufacturer: 'nintendo', value: "snes", name: "Super Nintendo Entertainment System" },
+            { manufacturer: 'nintendo', value: "n64", name: "Nintendo 64" },
+            { manufacturer: 'nintendo', value: "gamecube", name: "GameCube" },
+            { manufacturer: 'nintendo', value: "wii", name: "Wii" },
+            { manufacturer: 'microsoft', value: 'xss', name: 'Xbox Series S' },
+            { manufacturer: 'nintendo', value: "wiiu", name: "Wii U" },
+            { manufacturer: 'nintendo', value: "switch", name: "Switch" },
+            { manufacturer: 'sony', value: 'ps1', name: 'PlayStation' },
+            { manufacturer: 'sony', value: 'ps2', name: 'PlayStation 2' },
+            { manufacturer: 'sony', value: 'ps3', name: 'PlayStation 3' },
+            { manufacturer: 'sony', value: 'ps4', name: 'PlayStation 4' },
+            { manufacturer: 'sony', value: 'ps5', name: 'PlayStation 5' },
+            { manufacturer: 'microsoft', value: 'xbox', name: 'Xbox' },
+            { manufacturer: 'microsoft', value: '360', name: 'Xbox 360' },
+            { manufacturer: 'microsoft', value: 'xbone', name: 'Xbox One' },
+            { manufacturer: 'microsoft', value: 'xsx', name: 'Xbox Series X' }
+        ],
+        // Define the function that will generate the option groups
+        optionGroupRegister: function (optgroup) {
+            // Capitalize the manufacturer name for the label
+            var capitalised = optgroup.charAt(0).toUpperCase() + optgroup.substring(1);
+            // Create the group object
+            var group = {
+                label: 'Manufacturer: ' + capitalised
+            };
+            // Set the value of the group to be the manufacturer name
+            group[this.settings.optgroupValueField] = optgroup;
+
+            return group;
+        },
+        // Set the field to use as the optgroup label
+        optgroupField: 'manufacturer',
+        // Set the field to use as the option label
+        labelField: 'name',
+        // Set the fields to search for in the options
+        searchField: ['name'],
+        // Set the field to use for sorting the options
+        sortField: 'name'
+    });
+
+    // Initialize the selectize for the 'normalize' select element
+    $('#normalize').selectize();
+
+    // Set the value of the 'select-console' and 'normalize' select elements
+    $("#select-console")[0].selectize.setValue("ps5");
+    $("#normalize")[0].selectize.setValue("5");
+
+    // Retrieve the selected values and display them
+    function displaySelectedValues() {
+        const selectedValue1 = selectizeInstance[0].selectize.getValue();
+        const selectedValue2 = $('#normalize')[0].selectize.getValue();
+        const displayArea = document.getElementById('selectedItem');
+        displayArea.value = `${selectedValue1}, ${selectedValue2}`;
+    }
+
+</script>

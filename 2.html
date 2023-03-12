@@ -6,12 +6,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tagify Example</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+        integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+        integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD"
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
-    <input name='users-list-tags' class='selectMode' placeholder="Please select">
+    <button type="button" class="btn btn-primary" onclick="showModal()">
+        Launch modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                </div>
+                <div class="modal-body">
+                    Modal content goes here.
+                    <input name='users-list-tags' placeholder="Please select">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 </body>
@@ -154,8 +186,20 @@
 
 <script>
 
+
+    async function showModal() {
+        const modal = new bootstrap.Modal("#myModal", {
+            backdrop: "static",
+            keyboard: true,
+        });
+        modal.show();
+
+        tagify = await filterData()
+        tagify.addTags(['Hạ tầng cơ sở, trang thiết bị'])
+
+    }
+
     const filterData = async () => {
-        var inputElm = document.querySelector('input[name=users-list-tags]');
 
         // const users = await getUsers();
         const users = [
@@ -800,7 +844,8 @@
             return { value: idLsc, ...rest };
         });
 
-        console.log('newArray', newArray)
+        var inputElm = document.querySelector('input[name=users-list-tags]');
+
 
         newArray.sort((a, b) => a.value - b.value);
 
@@ -808,7 +853,7 @@
             tagTextProp: 'chitietSuco', // very important since a custom template is used with this property as text
             enforceWhitelist: true,
             skipInvalid: true, // do not remporarily add invalid tags
-            mode: "select",
+            // mode: "select",
             dropdown: {
                 closeOnSelect: false,
                 maxItems: "Infinity",
@@ -818,7 +863,7 @@
             },
             templates: {
                 // tag: tagTemplate,
-                // dropdownItem: suggestionItemTemplate,
+                dropdownItem: suggestionItemTemplate,
             },
             whitelist: newArray,
         })
@@ -827,11 +872,9 @@
         // (since each user also has a 'team' property)
         tagify.dropdown.createListHTML = suggestionsList => {
 
-            console.log('suggestionsList', suggestionsList)
 
             const teamsOfUsers = suggestionsList?.reduce((acc, suggestion) => {
 
-                console.log('suggestion', suggestion)
                 const team = suggestion.nhomSuco || 'Not Assigned';
 
                 if (!acc[team])
@@ -842,20 +885,16 @@
                 return acc
             }, {})
 
-            console.log('teamsOfUsers', teamsOfUsers)
 
             const getUsersSuggestionsHTML = teamUsers => teamUsers.map((suggestion, idx) => {
 
-                console.log('teamUsers', teamUsers)
 
                 if (typeof suggestion == 'string' || typeof suggestion == 'number')
                     suggestion = { value: suggestion }
 
-                console.log('suggestion', suggestion)
 
                 var value = tagify.dropdown.getMappedValue.call(tagify, suggestion)
 
-                console.log('value', value)
 
                 suggestion.value = value
 
@@ -864,12 +903,16 @@
 
             // assign the user to a group
             return Object.entries(teamsOfUsers).map(([team, teamUsers]) => {
-                return `<div class="tagify__dropdown__itemsGroup" data-title="${team}">${getUsersSuggestionsHTML(teamUsers)}</div>`
+                return `<div class="tagify__dropdown__itemsGroup" data-title="Team ${team}">${getUsersSuggestionsHTML(teamUsers)}</div>`
             }).join("")
         }
 
-        function tagTemplate(tagData) {
-            return `<tag title="${tagData.value}"
+        return tagify;
+
+    };
+
+    function tagTemplate(tagData) {
+        return `<tag title="${tagData.value}"
                         contenteditable='false'
                         spellcheck='false'
                         tabIndex="-1"
@@ -881,22 +924,19 @@
                         </div>
                     </tag>
                 `
-        }
+    }
 
-        function suggestionItemTemplate(tagData) {
-            console.log('tagData1', tagData)
-            return `
+    function suggestionItemTemplate(tagData) {
+        return `
                 <div ${this.getAttributes(tagData)}
                     class='tagify__dropdown__item ${tagData.class ? tagData.class : ""}'
                     tabindex="0"
                     role="option">
-                    <strong>${tagData.chitietSuco}</strong>
-                    <span>${tagData.value}</span>
+                    <span>${tagData.chitietSuco}</span>
                 </div>
                         `
-        }
-    };
+    }
 
-    filterData();
+    // filterData();
 
 </script>
