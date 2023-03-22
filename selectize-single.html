@@ -16,6 +16,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js"></script>
+
     <title>Document</title>
 </head>
 
@@ -77,10 +78,45 @@
         </div>
     </div>
 
+    <select id="mySelect">
+        <option value="">Select an option</option>
+        <option value="option1">Option 1</option>
+        <option value="option2">Option 2</option>
+        <option value="option3">Option 3</option>
+    </select>
+    <div id="selectedOptions"></div>
+
+
+
 </body>
 
 </html>
 <script>
+
+    // Get the select element and the div element to display the selected options
+    const select = document.getElementById("mySelect");
+    const selectedOptionsDiv = document.getElementById("selectedOptions");
+
+    // Add event listener to select element to detect changes in selection
+    select.addEventListener("change", function (event) {
+        const option = event.target.selectedOptions[0];
+        // Create a new div element to display the selected option and delete button
+        const selectedOptionDiv = document.createElement("div");
+        selectedOptionDiv.classList.add("selected-option");
+        const selectedOptionText = document.createTextNode(option.textContent);
+        const deleteButton = document.createElement("button");
+        const deleteButtonText = document.createTextNode("Delete");
+        deleteButton.appendChild(deleteButtonText);
+        deleteButton.addEventListener("click", function () {
+            selectedOptionDiv.remove();
+            // Remove the option from the select element as well
+            option.remove();
+        });
+        selectedOptionDiv.appendChild(selectedOptionText);
+        selectedOptionDiv.appendChild(deleteButton);
+        selectedOptionsDiv.appendChild(selectedOptionDiv);
+    });
+
     // Define the available options for the dropdown
     $('#select-console').selectize({
         options: [

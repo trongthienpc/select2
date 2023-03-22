@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <select id="mySelect">
+        <option value="1">
+            Option 1
+            <button class="delete-btn">Delete</button>
+        </option>
+        <option value="2">
+            Option 2
+            <button class="delete-btn">Delete</button>
+        </option>
+        <option value="3">
+            Option 3
+            <button class="delete-btn">Delete</button>
+        </option>
+    </select>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get the select element and all the delete buttons
+            const select = document.getElementById('mySelect');
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+
+            console.log('deleteButtons :>> ', deleteButtons);
+
+            // Add an event listener to each delete button
+            deleteButtons.forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    // Get the parent option element and remove it from the select element
+                    const option = event.target.parentElement;
+                    select.removeChild(option);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

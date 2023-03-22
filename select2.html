@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Selectize.js Dropdown with Table of Options</title>
+    <!-- Include Selectize CSS and JS files -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/css/selectize.default.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/js/standalone/selectize.min.js"></script>
+    <!-- Add custom CSS to style the option table -->
+    <style>
+        #optionTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #optionTable th,
+        #optionTable td {
+            padding: 5px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        #optionTable th {
+            background-color: #f2f2f2;
+        }
+
+        #optionTable button {
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Create a select element with an empty option and set the class to "selectize" -->
+    <select id="mySelect" class="selectize">
+        <option value=""></option>
+    </select>
+    <!-- Add a table element to display the options -->
+    <table id="optionTable" style="display:none;">
+        <thead>
+            <tr>
+                <th>Option</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Option 1</td>
+                <td><button>Delete</button></td>
+            </tr>
+            <tr>
+                <td>Option 2</td>
+                <td><button>Delete</button></td>
+            </tr>
+            <tr>
+                <td>Option 3</td>
+                <td><button>Delete</button></td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- Add script to initialize Selectize and bind events to table buttons -->
+    <script>
+        $(document).ready(function () {
+            // Initialize Selectize
+            var selectize = $('#mySelect').selectize({
+                plugins: ['remove_button'],
+                render: {
+                    option: function (data, escape) {
+                        return '<div>' + escape(data.text) + '</div>';
+                    }
+                },
+                dropdownParent: 'body'
+            });
+            // Show/hide the option table based on Selectize events
+            selectize[0].$dropdown.on('mousedown', function () {
+                $('#optionTable').show();
+            });
+            selectize[0].$dropdown.on('mouseup', function () {
+                $('#optionTable').hide();
+            });
+            // Bind click event to table buttons
+            $('#optionTable button').on('click', function () {
+                // Get the option text from the first column of the row
+                var optionText = $(this).closest('tr').find('td:first').text();
+                // Remove the option from the Selectize dropdown
+                selectize[0].selectize.removeOption(optionText);
+                // Remove the row from the table
+                $(this).closest('tr').remove();
+            });
+        });
+    </script>
+</body>
+
+</html
